@@ -1,0 +1,3 @@
+[submodule "lib/pbl_strftime"]
+	path = lib/pbl_strftime
+	url = git://github.com/Helco/pbl_strftime.git
