@@ -23,7 +23,7 @@ STOP=\033[0m
 
 ifeq ($(VERBOSE),)
 QUIET = @
-SAY = @echo "${GREEN}"$(1)"${STOP}"
+SAY = @echo -e "${GREEN}"$(1)"${STOP}"
 else
 QUIET =
 SAY =
