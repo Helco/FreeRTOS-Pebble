@@ -105,6 +105,9 @@ typedef struct MenuLayer
   GColor bg_hi_color;
   GColor fg_color;
   GColor fg_hi_color;
+
+  bool isCenterFocused;
+  bool isBottomPaddingEnabled;
 } MenuLayer;
 
 
@@ -154,11 +157,17 @@ void menu_layer_set_center_focused(MenuLayer *menu_layer, bool center_focused);
 
 bool menu_layer_is_index_selected(const MenuLayer *menu_layer, MenuIndex *index);
 
-
+#ifdef PBL_RECT
 #define MENU_CELL_BASIC_HEADER_HEIGHT ((const int16_t) 16)
+#define MENU_CELL_BASIC_CELL_HEIGHT ((const int16_t) DISPLAY_ROWS / 4)
+#else
+#define MENU_CELL_BASIC_CELL_HEIGHT ((const int16_t) DISPLAY_ROWS)
+#define MENU_CELL_BASIC_HEADER_HEIGHT ((const int16_t) 16)
+#endif
+
 #define MENU_INDEX_NOT_FOUND ((const uint16_t) ~0)
 #define MENU_CELL_ROUND_FOCUSED_SHORT_CELL_HEIGHT ((const int16_t) 68)
 #define MENU_CELL_ROUND_FOCUSED_TALL_CELL_HEIGHT ((const int16_t) 84)
 #define MENU_CELL_ROUND_UNFOCUSED_SHORT_CELL_HEIGHT ((const int16_t) 24)
 #define MENU_CELL_ROUND_UNFOCUSED_TALL_CELL_HEIGHT ((const int16_t) 32)
-
+#define MENU_BOTTOM_PADDING ((const int16_t) 20)
