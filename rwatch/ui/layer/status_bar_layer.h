@@ -11,8 +11,7 @@
 #include "size.h"
 #include "bitmap_layer.h"
 
-#define STATUS_BAR_LAYER_HEIGHT 16
-#define _STATUS_BAR_LAYER_HEIGHT 16
+#define STATUS_BAR_LAYER_HEIGHT (PBL_PLATFORM_SWITCH(16, 16, 24, 16, 20))
 
 typedef enum StatusBarLayerSeparatorMode
 {
@@ -22,10 +21,10 @@ typedef enum StatusBarLayerSeparatorMode
 
 typedef struct StatusBarLayer
 {
-    Layer *layer;
-    GColor text_color;
+    Layer layer;
+    GColor foreground_color;
     GColor background_color;
-    StatusBarLayerSeparatorMode *separator_mode;
+    StatusBarLayerSeparatorMode separator_mode;
 } StatusBarLayer;
 
 StatusBarLayer* status_bar_layer_create(void);
