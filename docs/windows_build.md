@@ -7,39 +7,23 @@ So unfortunately there is no known way (yet), to fully work on Windows while wor
 - Install [VirtualBox](http://www.virtualbox.org/)
 - Download Linux ISO file (Ubuntu 16.04.3 LTS) from [their website](https://www.ubuntu.com/download/desktop)
 - Inside virtualbox install Ubuntu
+- You propably want to install the guest additions from VirtualBox
 - Once inside the booted Ubuntu, open a terminal and run these commands:
 
 ### Install pebble SDK
 
-```
-mkdir ~/pebble-dev/
-cd ~/pebble-dev/
-wget https://s3.amazonaws.com/assets.getpebble.com/pebble-tool/pebble-sdk-4.5-linux64.tar.bz2
-tar -jxf pebble-sdk-4.5-linux64.tar.bz2
-echo 'export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH' >> ~/.bashrc
-. ~/.bashrc
-sudo apt-get update
-sudo apt-get install python-pip python2.7-dev python-gevent libsdl1.2debian libfdt1 libpixman-1-0 git gcc-arm-none-eabi npm
-pip install --upgrade pip
-pip install virtualenv
-cd ~/pebble-dev/pebble-sdk-4.5-linux64
-virtualenv --no-site-packages .env
-source .env/bin/activate
-pip install -r requirements.txt
-deactivate
-```
-
-To test if everything works correctly, run `pebble ping --emulator aplite`
+For installing the pebble sdk, please see the instructions in the [debian build documentation](https://github.com/ginge/FreeRTOS-Pebble/blob/master/docs/debian_build.md)
+To install the pebble core-sdk run `pebble ping --emulator aplite`. This should also test if qemu works with your setup.
 
 ### Setting up rebble development environment on Ubuntu
 
-```
+```sh
 cd ~/pebble-dev/
 git clone https://github.com/ginge/FreeRTOS-Pebble.git
 cd FreeRTOS-Pebble
 ./Utilities/mk_resources.sh ~/.pebble-sdk/SDKs/current/sdk-core/pebble/
-cd Resources 
-wget http://emarhavil.com/~joshua/snowy_fpga.bin http://emarhavil.com/~joshua/chalk_fpga.bin
+cd Resources
+wget # find the URLs of the fpga files in the `#firmware` channel in the Rebble Discord
 cd ..
 make
 make snowy_qemu
@@ -60,20 +44,20 @@ If you are a more experienced, you can follow these steps to gradually move some
 
 You can now compile the firmware by first cloning this repository and then running `make` (explicitly the one you downloaded) in the root folder, e.g.
 
-```
+```batch
 C:\msys\bin\make.exe snowy_qemu
 ```
 
 To prevent the copying of the compiled firmware, you can set up a shared folder in VirtualBox (in the menu tab "Devices"). However you can only have build files from either Windows or Linux present, which basically refrains you from using `make`. To start the emulator you have to run the command yourself (or put it in a bash script nearby):
 
-```
+```sh
 cat Resources/snowy_boot.bin build/snowy/tintin_fw.bin > build/snowy/fw.qemu_flash.bin
 qemu-pebble -rtc base=localtime -serial null -serial null -serial stdio -gdb tcp::63770,server -machine pebble-snowy-bb -cpu cortex-m4 -pflash build/snowy/fw.qemu_flash.bin -pflash Resources/snowy_spi.bin
 ```
 
 and to attach gdb to it:
 
-```
+```sh
 arm-none-eabi-gdb -ex "target remote localhost:63770" -ex "sym build/snowy/tintin_fw.elf"
 ```
 
@@ -87,7 +71,7 @@ For remote debugging to work you first have to enable the communication to your 
 
 Then you can start the emulator on the virtual machine by running `make snowy_qemu` and then in windows:
 
-```
+```batch
 C:\msys\bin\arm-none-eabi-gdb.exe -ex "target remote localhost:63770" -ex "sym build/snowy/tintin_fw.elf"
 ```
 
@@ -95,7 +79,7 @@ C:\msys\bin\arm-none-eabi-gdb.exe -ex "target remote localhost:63770" -ex "sym b
 
 For building you can use this `tasks.json`:
 
-```
+```json
 {
     "version": "2.0.0",
     "tasks": [
