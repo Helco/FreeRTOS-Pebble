@@ -8,12 +8,11 @@ So unfortunately there is no known way (yet), to fully work on Windows while wor
 - Download Linux ISO file (Ubuntu 16.04.3 LTS) from [their website](https://www.ubuntu.com/download/desktop)
 - Inside virtualbox install Ubuntu
 - You propably want to install the guest additions from VirtualBox
-- Once inside the booted Ubuntu, open a terminal and run these commands:
+- Once inside the booted Ubuntu, open a terminal for further install steps
 
 ### Install pebble SDK
 
 For installing the pebble sdk, please see the instructions in the [debian build documentation](https://github.com/ginge/FreeRTOS-Pebble/blob/master/docs/debian_build.md)
-To install the pebble core-sdk run `pebble ping --emulator aplite`. This should also test if qemu works with your setup.
 
 ### Setting up rebble development environment on Ubuntu
 
@@ -86,11 +85,11 @@ For building you can use this `tasks.json`:
         {
             "label": "Build all",
             "type": "shell",
-            "command": "C:/Users/Helco/Documents/Dev/2PC_ImportantProjects/pebbledev/msys/bin/make.exe",
+            "command": "C:\\msys\\bin\\make.exe",
             "args": [ ],
             "options": {
                 "env": {
-                    "PATH": "C:\\Users\\Helco\\Documents\\Dev\\2PC_ImportantProjects\\pebbledev\\msys\\bin"
+                    "PATH": "C:\\msys\\bin"
                 }
             },
             "group": {
