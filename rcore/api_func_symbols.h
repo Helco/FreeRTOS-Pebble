@@ -2,6 +2,8 @@
 #include "rebbleos.h"
 #include "librebble.h"
 #include "graphics_wrapper.h"
+#include "battery_state_service.h"
+
 GBitmap *gbitmap_create_with_resource_proxy(uint32_t resource_id);
 ResHandle *resource_get_handle_proxy(uint16_t resource_id);
 bool persist_exists(void);
@@ -11,7 +13,7 @@ typedef void (*VoidFunc)(void);
 typedef void (*UnimplFunc)(void);
 
 
-#define UNIMPL(FN) void FN(){ printf("== Unimplemented: %s ==\n", __func__); }
+#define UNIMPL(FN) void FN(){ SYS_LOG("API", APP_LOG_LEVEL_WARNING, "== Unimplemented: %s ==\n", __func__); }
 UNIMPL(_accel_data_service_subscribe__deprecated);
 UNIMPL(_accel_data_service_unsubscribe);
 UNIMPL(_accel_service_peek);
@@ -51,9 +53,6 @@ UNIMPL(_app_sync_init);
 UNIMPL(_app_sync_set);
 UNIMPL(_atan2_lookup);
 UNIMPL(_atol);
-UNIMPL(_battery_state_service_peek);
-UNIMPL(_battery_state_service_subscribe);
-UNIMPL(_battery_state_service_unsubscribe);
 UNIMPL(_bitmap_layer_set_background_color_2bit);
 UNIMPL(_bluetooth_connection_service_peek);
 UNIMPL(_bluetooth_connection_service_subscribe);
@@ -268,7 +267,6 @@ UNIMPL(_gbitmap_sequence_restart);
 UNIMPL(_gbitmap_sequence_set_play_count);
 UNIMPL(_gbitmap_sequence_update_bitmap_by_elapsed);
 UNIMPL(_graphics_draw_rotated_bitmap);
-UNIMPL(_time);
 UNIMPL(_difftime);
 UNIMPL(_time_ms);
 UNIMPL(_gcolor_legible_over);
@@ -324,6 +322,23 @@ UNIMPL(_health_service_metric_averaged_accessible);
 UNIMPL(_health_service_sum_averaged);
 UNIMPL(_health_service_get_measurement_system_for_display);
 UNIMPL(_gdraw_command_frame_get_command_list);
+UNIMPL(_unimpl613);
+UNIMPL(_unimpl614);
+UNIMPL(_unimpl615);
+UNIMPL(_unimpl616);
+UNIMPL(_unimpl617);
+UNIMPL(_unimpl618);
+UNIMPL(_unimpl619);
+UNIMPL(_unimpl620);
+UNIMPL(_unimpl621);
+UNIMPL(_unimpl623);
+UNIMPL(_unimpl624);
+UNIMPL(_unimpl625);
+UNIMPL(_unimpl626);
+UNIMPL(_unimpl628);
+UNIMPL(_unimpl629);
+UNIMPL(_unimpl630);
+UNIMPL(_unimpl631);
 
 const VoidFunc sym[] = {
 
@@ -335,7 +350,9 @@ const VoidFunc sym[] = {
     [49]  = (VoidFunc)app_timer_reschedule,                                                     // app_timer_reschedule@000000c4
                                                                                                 
     [51]  = (VoidFunc)atoi,                                                                     // atoi@000000cc
-                                                                                                
+    [53]  = (VoidFunc)battery_state_service_peek,                                               // battery_state_service_peek@000000d4
+    [54]  = (VoidFunc)battery_state_service_subscribe,                                          // battery_state_service_subscribe@000000d8
+    [55]  = (VoidFunc)battery_state_service_unsubscribe,                                        // battery_state_service_unsubscribe@000000dc                                                                                               
     [56]  = (VoidFunc)bitmap_layer_create,                                                      // bitmap_layer_create@000000e0
     [57]  = (VoidFunc)bitmap_layer_destroy,                                                     // bitmap_layer_destroy@000000e4
     [58]  = (VoidFunc)bitmap_layer_get_layer,                                                   // bitmap_layer_get_layer@000000e8
@@ -626,7 +643,7 @@ const VoidFunc sym[] = {
     [516] = (VoidFunc)property_animation_create_bounds_origin,                                 // property_animation_create_bounds_origin@00000810
     [517] = (VoidFunc)property_animation_update_uint32,                                        // property_animation_update_uint32@00000814
     [518] = (VoidFunc)gpath_draw_app,                                                          // gpath_draw_outline_open@00000818
-
+    [519] = (VoidFunc)pbl_time_t_deprecated,                                                     // time@0000081c
     [520] = (VoidFunc)menu_layer_set_highlight_colors,                                         // menu_layer_set_highlight_colors@00000820
     [521] = (VoidFunc)menu_layer_set_normal_colors,                                            // menu_layer_set_normal_colors@00000824
     [522] = (VoidFunc)menu_layer_set_callbacks,                                                // menu_layer_set_callbacks@00000828
@@ -674,6 +691,7 @@ const VoidFunc sym[] = {
     [598] = (VoidFunc)menu_layer_is_index_selected,                                            // menu_layer_is_index_selected@00000958
     
     [622] = (VoidFunc)layer_get_unobstructed_bounds,
+    [627] = (VoidFunc)rocky_event_loop_with_resource,
     
     /* These functions are not yet implemented */
     
@@ -717,9 +735,6 @@ const VoidFunc sym[] = {
     [46]  = (UnimplFunc)_app_sync_set,                                                         // app_sync_set@000000b8
     [50]  = (UnimplFunc)_atan2_lookup,                                                         // atan2_lookup@000000c8
     [52]  = (UnimplFunc)_atol,                                                                 // atol@000000d0
-    [53]  = (UnimplFunc)_battery_state_service_peek,                                           // battery_state_service_peek@000000d4
-    [54]  = (UnimplFunc)_battery_state_service_subscribe,                                      // battery_state_service_subscribe@000000d8
-    [55]  = (UnimplFunc)_battery_state_service_unsubscribe,                                    // battery_state_service_unsubscribe@000000dc
     [60]  = (UnimplFunc)_bitmap_layer_set_background_color_2bit,                               // bitmap_layer_set_background_color_2bit@000000f0
     [63]  = (UnimplFunc)_bluetooth_connection_service_peek,                                    // bluetooth_connection_service_peek@000000fc
     [64]  = (UnimplFunc)_bluetooth_connection_service_subscribe,                               // bluetooth_connection_service_subscribe@00000100
@@ -934,7 +949,6 @@ const VoidFunc sym[] = {
     [443] = (UnimplFunc)_gbitmap_sequence_set_play_count,                                      // gbitmap_sequence_set_play_count@000006ec
     [457] = (UnimplFunc)_gbitmap_sequence_update_bitmap_by_elapsed,                            // gbitmap_sequence_update_bitmap_by_elapsed@00000724
     [460] = (UnimplFunc)_graphics_draw_rotated_bitmap,                                         // graphics_draw_rotated_bitmap@00000730
-    [519] = (UnimplFunc)_time,                                                                 // time@0000081c
     [531] = (UnimplFunc)_difftime,                                                             // difftime@0000084c
     [532] = (UnimplFunc)_time_ms,                                                              // time_ms@00000850
     [533] = (UnimplFunc)_gcolor_legible_over,                                                  // gcolor_legible_over@00000854
@@ -989,5 +1003,22 @@ const VoidFunc sym[] = {
     [609] = (UnimplFunc)_health_service_metric_averaged_accessible,                            // health_service_metric_averaged_accessible@00000984
     [610] = (UnimplFunc)_health_service_sum_averaged,                                          // health_service_sum_averaged@00000988
     [611] = (UnimplFunc)_health_service_get_measurement_system_for_display,                    // health_service_get_measurement_system_for_display@0000098c
-    [612] = (UnimplFunc)_gdraw_command_frame_get_command_list,                                 // gdraw_command_frame_get_command_list@00000990
+    [612] = (UnimplFunc)_gdraw_command_frame_get_command_list,                                 // gdraw_command_frame_get_command_list@00000990 
+    [613] = (UnimplFunc)_unimpl613,
+    [614] = (UnimplFunc)_unimpl614,
+    [615] = (UnimplFunc)_unimpl615,
+    [616] = (UnimplFunc)_unimpl616,
+    [617] = (UnimplFunc)_unimpl617,
+    [618] = (UnimplFunc)_unimpl618,
+    [619] = (UnimplFunc)_unimpl619,
+    [620] = (UnimplFunc)_unimpl620,
+    [621] = (UnimplFunc)_unimpl621,
+    [623] = (UnimplFunc)_unimpl623,
+    [624] = (UnimplFunc)_unimpl624,
+    [625] = (UnimplFunc)_unimpl625,
+    [626] = (UnimplFunc)_unimpl626,
+    [628] = (UnimplFunc)_unimpl628,
+    [629] = (UnimplFunc)_unimpl629,
+    [630] = (UnimplFunc)_unimpl630,
+    [631] = (UnimplFunc)_unimpl631,
 };

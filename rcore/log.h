@@ -8,12 +8,15 @@
 
 #include <stdarg.h>
 
+#define NULL_LOG(module_, lvl_, fmt_, ...) {;}
 #define SYS_LOG(module_, lvl_, fmt_, ...) \
             log_printf_to_ar(module_, "SYS", lvl_, __FILE__, __LINE__, fmt_, ##__VA_ARGS__)
 #define KERN_LOG(module_, lvl_, fmt_, ...) \
             log_printf_to_ar(module_, "KERN", lvl_, __FILE__, __LINE__, fmt_, ##__VA_ARGS__)
 #define DRV_LOG(module_, lvl_, fmt_, ...) \
             log_printf_to_ar(module_, "DRIVER", lvl_, __FILE__, __LINE__, fmt_, ##__VA_ARGS__)
+#define APP_LOG(module_, lvl_, fmt_, ...) \
+            log_printf_to_ar(module_, "APP", lvl_, __FILE__, __LINE__, fmt_, ##__VA_ARGS__)
 
 
 typedef enum LogLevel {

@@ -17,9 +17,11 @@ static void _notif_init(OverlayWindow *overlay_window);
 static void _notification_window_creating(OverlayWindow *overlay_window, Window *window);
 static void _notification_quit_click(ClickRecognizerRef _, void *context);
 
-void notification_init(void)
+uint8_t notification_init(void)
 {
     messages_init();
+    
+    return 0;
 }
 
 void notification_show_message(full_msg_t *msg, uint32_t timeout_ms)
@@ -46,6 +48,13 @@ void notification_show_message(full_msg_t *msg, uint32_t timeout_ms)
 
 void notification_show_battery(uint32_t timeout_ms)
 {
+    if (battery_overlay_visible())
+    {
+        /* if we are already visible, just request a redraw */
+        window_dirty(true);
+        return;
+    }
+    
     /* construct a BatteryLayer */
     notification_battery *nmsg = noty_calloc(1, sizeof(notification_battery));
     nmsg->data.create_callback = &battery_overlay_display;
@@ -129,14 +138,14 @@ static void _notification_quit_click(ClickRecognizerRef _, void *context)
      * thread.  So if it needs to, we just let it die off on its own, and
      * waste the wakeup later.  Oh, well.
      */
-    
-    printf("DESTROY _notification_quit_click\n\n");
+    SYS_LOG("NOTYM", APP_LOG_LEVEL_INFO, "DESTROY _notification_quit_click\n\n");
     window_dirty(true);
 }
 
 /* overlay thread */
 static void _notification_window_creating(OverlayWindow *overlay_window, Window *window)
 {
+    SYS_LOG("NOTYM", APP_LOG_LEVEL_INFO, "Creating");
     notification_message *nm = (notification_message *)overlay_window->context;
     nm->data.overlay_window = overlay_window;
         
@@ -145,10 +154,8 @@ static void _notification_window_creating(OverlayWindow *overlay_window, Window 
     window->context = overlay_window->context;
     
     /* call the function that we should execute */
-    if (!nm->data.create_callback)
-        return;
-    
-    nm->data.create_callback(overlay_window, &overlay_window->window);
+    if (nm->data.create_callback)
+        nm->data.create_callback(overlay_window, &overlay_window->window);
 
     if (nm->data.timer)
         app_timer_cancel(nm->data.timer);
