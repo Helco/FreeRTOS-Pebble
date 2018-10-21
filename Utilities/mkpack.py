@@ -44,11 +44,6 @@ import sys
 TAB_OFS = 0x0C
 RES_OFS = 0x200C
 
-def expand_path(path):
-    if path.startswith('~'):
-        path = os.path.expanduser(path)
-    return path
-
 def find_pebble_sdk():
     """
     Returns a valid path to the currently installed pebble sdk or 
@@ -59,8 +54,8 @@ def find_pebble_sdk():
         "~/Library/Application Support/Pebble SDK/SDKs/current",
         "~/.pebble-sdk/SDKs/current"
     ]:
-        if os.path.isdir(expand_path(path)):
-            return expand_path(path)
+        if os.path.isdir(os.path.expanduser(path)):
+            return os.path.expanduser(path)
     
     return None
 
@@ -349,7 +344,7 @@ def main():
 
     sdk_path = find_pebble_sdk()
     if args.sdk[0] is not None:
-        sdk_path = expand_path(args.sdk[0])
+        sdk_path = os.path.expanduser(args.sdk[0])
     if not os.path.isdir(sdk_path):
         raise ValueError("could not find pebble sdk, please provide one with --sdk")
     crush_png = import_crush_png(sdk_path)
