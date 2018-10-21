@@ -5,6 +5,7 @@
  * Author: Barry Carter <barry.carter@gmail.com>.
  */
 #include "overlay_manager.h"
+#include "ngfxwrap.h"
 
 /* A message to talk to the overlay thread */
 typedef struct OverlayMessage {
@@ -276,6 +277,8 @@ static void _overlay_thread(void *pvParameters)
     
     appmanager_init();
     SYS_LOG("overlay", APP_LOG_LEVEL_INFO, "Starting overlay thread...");
+
+    rwatch_neographics_init();
 
     _this_thread->status = AppThreadLoaded;
     

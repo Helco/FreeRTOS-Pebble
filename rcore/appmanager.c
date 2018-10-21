@@ -560,9 +560,6 @@ void appmanager_execute_app(app_running_thread *thread, uint32_t total_app_size)
     /* heap is all uint8_t */
     thread->arena = qinit(heap_entry, heap_size);
     
-    /* DANGER fix this properly. It should not reset here (overlay might be using it) */
-    rwatch_neographics_init();
-    
     /* Load the app in a vTask */
     xTaskCreateStatic(_appmanager_thread_init, 
                         "dynapp", 
