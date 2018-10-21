@@ -38,9 +38,45 @@ __author__ = "Joshua Wise <joshua@joshuawise.com>"
 from stm32_crc import crc32
 import struct
 import json
+import os
+import sys
 
 TAB_OFS = 0x0C
 RES_OFS = 0x200C
+
+def expand_path(path):
+    if path.startswith('~'):
+        path = os.path.expanduser(path)
+    return path
+
+def find_pebble_sdk():
+    """
+    Returns a valid path to the currently installed pebble sdk or 
+    nothing if none was found.
+    """
+
+    for path in [
+        "~/Library/Application Support/Pebble SDK/SDKs/current",
+        "~/.pebble-sdk/SDKs/current"
+    ]:
+        if os.path.isdir(expand_path(path)):
+            return expand_path(path)
+    
+    return None
+
+def import_crush_png(sdk_path):
+    """
+    Activates the sdks virtual environment and dynamically imports
+    the png2pblpng functionality
+    """
+
+    activate_this = os.path.join(sdk_path, ".env/bin/activate_this.py")
+    execfile(activate_this, dict(__file__=activate_this))
+    
+    sys.path.append(os.path.join(sdk_path, "sdk-core/pebble/common/tools/"))
+    from png2pblpng import convert_png_to_pebble_png_bytes
+    return convert_png_to_pebble_png_bytes
+
 
 def load_resource_from_pbpack(fname, resid):
     """
@@ -157,6 +193,23 @@ class ResourceFile(Resource):
     def sourcedesc(self):
         return self.file
 
+class ResourceImage(Resource):
+    def __init__(self, coll, j, crush_png, palette):
+        super(self.__class__, self).__init__(coll, j)
+        
+        self.file = "{}/{}".format(self.coll.root, j["input"]["file"])
+        self.crush_png = crush_png
+        self.palette = palette
+    
+    def deps(self):
+        return [self.file]
+    
+    def data(self):
+        return self.crush_png(self.file, self.palette)
+    
+    def sourcedesc(self):
+        return "imported image " + self.file
+
 class ResourceCollection:
     """
     A collection of resources, as defined by a dictionary loaded from a JSON
@@ -183,7 +236,7 @@ class ResourceCollection:
     
     """
 
-    def __init__(self, fname, root = "."):
+    def __init__(self, fname, root = ".", crush_png = None):
         """
         Load in a resource collection from a file, but don't load the
         resources associated with it.  (That happens later.)
@@ -199,6 +252,9 @@ class ResourceCollection:
             self.references = {k: "{}/{}".format(self.root, v) for k, v in jdb["references"].items()}
         else:
             self.references = {}
+
+        if "palette" not in jdb:
+            raise ValueError("palette is not set")
         
         self.resources = []
         for res in jdb["resources"]:
@@ -206,6 +262,8 @@ class ResourceCollection:
                 self.resources.append(ResourceFile(self, res))
             elif res["input"]["type"] == "resource":
                 self.resources.append(ResourceRef(self, res))
+            elif res["input"]["type"] == "image":
+                self.resources.append(ResourceImage(self, res, crush_png, jdb["palette"]))
             else:
                 raise ValueError("unknown resource type {}".format(res["type"]))
     
@@ -284,11 +342,19 @@ def main():
     parser.add_argument("-M", "--make-dep", action="store_true", default = False, help = "produce a .d file to be included by 'make'")
     parser.add_argument("-H", "--header", action = "store_true", default = False, help = "produce a .h file to be included in C source")
     parser.add_argument("-P", "--pbpack", action = "store_true", default = False, help = "produce a .pbpack file")
+    parser.add_argument("-s", "--sdk", nargs=1, default = [None], help = "pathname to pebble sdk")
     parser.add_argument("json", help = "input JSON configuration file")
     parser.add_argument("basename", help = "base output name ('.d', '.h', and '.pbpack' are appended automatically)")
     args = parser.parse_args()
+
+    sdk_path = find_pebble_sdk()
+    if args.sdk[0] is not None:
+        sdk_path = expand_path(args.sdk[0])
+    if not os.path.isdir(sdk_path):
+        raise ValueError("could not find pebble sdk, please provide one with --sdk")
+    crush_png = import_crush_png(sdk_path)
     
-    rc = ResourceCollection(args.json, root = args.root[0])
+    rc = ResourceCollection(args.json, root = args.root[0], crush_png = crush_png)
     
     pbpack_name = "{}.pbpack".format(args.basename)
     header_name = "{}.h".format(args.basename)
