@@ -41,6 +41,8 @@ import json
 import os
 import sys
 
+crush_png = None # To be imported
+
 TAB_OFS = 0x0C
 RES_OFS = 0x200C
 
@@ -189,18 +191,17 @@ class ResourceFile(Resource):
         return self.file
 
 class ResourceImage(Resource):
-    def __init__(self, coll, j, crush_png, palette):
+    def __init__(self, coll, j, palette):
         super(self.__class__, self).__init__(coll, j)
         
         self.file = "{}/{}".format(self.coll.root, j["input"]["file"])
-        self.crush_png = crush_png
         self.palette = palette
     
     def deps(self):
         return [self.file]
     
     def data(self):
-        return self.crush_png(self.file, self.palette)
+        return crush_png(self.file, self.palette)
     
     def sourcedesc(self):
         return "imported image " + self.file
@@ -231,7 +232,7 @@ class ResourceCollection:
     
     """
 
-    def __init__(self, fname, root = ".", crush_png = None):
+    def __init__(self, fname, root = "."):
         """
         Load in a resource collection from a file, but don't load the
         resources associated with it.  (That happens later.)
@@ -258,7 +259,7 @@ class ResourceCollection:
             elif res["input"]["type"] == "resource":
                 self.resources.append(ResourceRef(self, res))
             elif res["input"]["type"] == "image":
-                self.resources.append(ResourceImage(self, res, crush_png, jdb["palette"]))
+                self.resources.append(ResourceImage(self, res, jdb["palette"]))
             else:
                 raise ValueError("unknown resource type {}".format(res["type"]))
     
@@ -347,9 +348,10 @@ def main():
         sdk_path = os.path.expanduser(args.sdk[0])
     if not os.path.isdir(sdk_path):
         raise ValueError("could not find pebble sdk, please provide one with --sdk")
+    global crush_png
     crush_png = import_crush_png(sdk_path)
     
-    rc = ResourceCollection(args.json, root = args.root[0], crush_png = crush_png)
+    rc = ResourceCollection(args.json, root = args.root[0])
     
     pbpack_name = "{}.pbpack".format(args.basename)
     header_name = "{}.h".format(args.basename)
