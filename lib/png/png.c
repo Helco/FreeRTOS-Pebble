@@ -42,7 +42,6 @@ void png_to_gbitmap(GBitmap *bitmap, uint8_t *raw_buffer, size_t png_size)
         goto freepng;
     }
 
-    SYS_LOG("png", APP_LOG_LEVEL_INFO, "UPNG Decode format: %d", upng_get_format(upng));
 
     /* XXX: this leaks the buffer if we don't take this codepath */
     if (upng_get_format(upng) >= UPNG_INDEXED1 || upng_get_format(upng) <= UPNG_INDEXED8)
