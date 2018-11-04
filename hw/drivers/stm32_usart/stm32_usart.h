@@ -46,6 +46,7 @@ void stm32_usart_init_device(stm32_usart_t *usart);
 void stm32_usart_set_baud(stm32_usart_t *usart, uint32_t baud);
 size_t stm32_usart_write(stm32_usart_t *usart, const uint8_t *buf, size_t len);
 size_t stm32_usart_read(stm32_usart_t *usart, uint8_t *buf, size_t len);
+int stm32_usart_has_data(stm32_usart_t *usart);
 void stm32_usart_send_dma(stm32_usart_t *usart, uint32_t *data, size_t len);
 void stm32_usart_recv_dma(stm32_usart_t *usart, uint32_t *data, size_t len);
 

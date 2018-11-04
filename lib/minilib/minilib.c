@@ -17,23 +17,23 @@ void _memcpy_fast(void *dest, const void *src, int bytes)
 {
 	/* I hate everyone */
 	/* Since we otherwise compile with -O0, we might as well manually speed this up a bit. */
-	
+
 	char *cdest = dest;
 	const char *csrc = src;
 	int *idest;
 	const int *isrc;
 	int nwords;
-	
+
 	/* Align to src (picked arbitrarily; might as well align to something) */
 	while (bytes && ((unsigned int)csrc & 3))
 	{
 		*(cdest++) = *(csrc++);
 		bytes--;
 	}
-	
+
 	idest = (int *)cdest;
 	isrc = (const int *)csrc;
-	
+
 	nwords = bytes / 4;
 	bytes -= bytes & ~3;
 	if (nwords != 0)
@@ -48,7 +48,7 @@ void _memcpy_fast(void *dest, const void *src, int bytes)
 		case  2:	nwords--; *(idest++) = *(isrc++);
 		case  1:	nwords--; *(idest++) = *(isrc++);
 			} while (nwords);
-	
+
 	cdest = (char *)idest;
 	csrc = (const char *)isrc;
 	while (bytes)	/* Clean up the remainder */
@@ -62,7 +62,7 @@ void _memcpy_slow(void *dest, const void *src, int bytes)
 {
 	unsigned char *cdest = dest;
 	const unsigned char *csrc = src;
-	
+
 	while (bytes--)
 		*(cdest++) = *(csrc++);
 }
@@ -108,7 +108,7 @@ void *memmove(void *dest, const void *src, int bytes)
 			*(--cdest) = *(--csrc);
 	} else
 		memcpy(dest, src, bytes);
-	
+
 	return dest;
 }
 
@@ -151,24 +151,24 @@ int strlen(const char *c)
 void *strcpy(char *a2, const char *a1)
 {
 	char *origa2 = a2;
-	
+
 	do {
 		*(a2++) = *a1;
 	} while (*(a1++));
-	
+
 	return origa2;
 }
 
 void *strcat(char *dest, const char *src)
 {
 	char *origdest = dest;
-	
+
 	while (*dest)
 		dest++;
 	while (*src)
 		*(dest++) = *(src++);
 	*(dest++) = *(src++);
-	
+
 	return origdest;
 }
 static const char hexarr[] = "0123456789ABCDEF";
@@ -199,6 +199,16 @@ unsigned int htonl(unsigned int in)
 	       ((in & 0xff00) << 8) |
 	       ((in & 0xff0000UL) >> 8) |
 	       ((in & 0xff000000UL) >> 24);
+}
+
+unsigned short ntohs(unsigned short in)
+{
+	return htons(in); // for pebble this is equivalent
+}
+
+unsigned int ntohl(unsigned int in)
+{
+	return htonl(in);
 }
 
 int atoi(const char *c)

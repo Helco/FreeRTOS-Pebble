@@ -18,4 +18,5 @@
 #include "snowy_ext_flash.h"
 #include "btstack_rebble.h"
 #include "snowy_bluetooth.h"
+#include "snowy_qemu.h"
 #include "debug.h"

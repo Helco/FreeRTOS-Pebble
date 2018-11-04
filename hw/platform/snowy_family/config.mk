@@ -25,6 +25,7 @@ SRCS_snowy_family += hw/platform/snowy_family/snowy_vibrate.c
 SRCS_snowy_family += hw/platform/snowy_family/snowy_ambient.c
 SRCS_snowy_family += hw/platform/snowy_family/snowy_ext_flash.c
 SRCS_snowy_family += hw/platform/snowy_family/snowy_common.c
+SRCS_snowy_family += hw/platform/snowy_family/snowy_qemu.c
 
 LDFLAGS_snowy_family = $(LDFLAGS_stm32f4xx)
 LIBS_snowy_family = $(LIBS_stm32f4xx)

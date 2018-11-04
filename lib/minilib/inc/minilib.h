@@ -32,6 +32,8 @@ extern void tohex(char *s, unsigned long l);
 extern void btohex(char *s, unsigned char c);
 extern unsigned short htons(unsigned short in);
 extern unsigned int htonl(unsigned int in);
+extern unsigned short ntohs(unsigned short in);
+extern unsigned int ntohl(unsigned int in);
 
 /* crc32.c */
 extern void crc32_init();

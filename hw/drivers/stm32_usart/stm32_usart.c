@@ -248,3 +248,16 @@ size_t stm32_usart_read(stm32_usart_t *usart, uint8_t *buf, size_t len)
     
     return i;
 }
+
+int stm32_usart_has_data(stm32_usart_t *usart)
+{
+    stm32_power_request(usart->config->usart_periph_bus, usart->config->usart_clock);
+    stm32_power_request(STM32_POWER_AHB1, usart->config->gpio_clock);
+
+    int result = (usart->config->usart->SR & USART_FLAG_RXNE) != 0;
+
+    stm32_power_release(usart->config->usart_periph_bus, usart->config->usart_clock);
+    stm32_power_release(STM32_POWER_AHB1, usart->config->gpio_clock);
+
+    return result;
+}
